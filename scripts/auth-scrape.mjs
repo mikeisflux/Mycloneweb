@@ -387,7 +387,6 @@ async function main() {
 
     banner('Login');
     const email = await ask(rl, '  Email / Username: ');
-    const password = await askSecret(rl, '  Password: ');
 
     // Fill email
     const emailSelectors = [
@@ -408,38 +407,50 @@ async function main() {
       await page.fill(sel, email);
     }
 
-    // Fill password (may appear after clicking Continue on multi-step forms)
+    // Check if a password field exists — many sites are email-only (magic link / OTP)
     const passwordSelectors = [
       'input[type="password"]',
       'input[name*="pass" i]',
       'input[placeholder*="password" i]',
       'input[autocomplete="current-password"]',
     ];
-    let pwFilled = false;
+    let passwordFieldExists = false;
     for (const sel of passwordSelectors) {
-      const el = await page.$(sel);
-      if (el) { await el.fill(password); pwFilled = true; break; }
-    }
-    if (!pwFilled) {
-      // Click Continue to reveal step-2 password field
-      const btn = await page.$('button[type="submit"], button:has-text("Continue")');
-      if (btn) {
-        await btn.click();
-        await page.waitForTimeout(1500);
-        for (const sel of passwordSelectors) {
-          const el = await page.$(sel);
-          if (el) { await el.fill(password); pwFilled = true; break; }
-        }
-      }
-    }
-    if (!pwFilled) {
-      const sel = await ask(rl, '  Could not find password field. Enter CSS selector (Enter to skip): ');
-      if (sel) await page.fill(sel, password);
+      if (await page.$(sel)) { passwordFieldExists = true; break; }
     }
 
-    console.log('  Submitting...');
-    await submitForm(page);
-    await page.waitForTimeout(3000);
+    let pwFilled = false;
+    if (passwordFieldExists) {
+      const password = await askSecret(rl, '  Password: ');
+      for (const sel of passwordSelectors) {
+        const el = await page.$(sel);
+        if (el) { await el.fill(password); pwFilled = true; break; }
+      }
+    } else {
+      // Submit email and check if password field appears on next step
+      console.log('  No password field detected — submitting email only.');
+      await submitForm(page);
+      await page.waitForTimeout(2000);
+
+      // If step-2 reveals a password field, ask for it then
+      for (const sel of passwordSelectors) {
+        const el = await page.$(sel);
+        if (el) {
+          const password = await askSecret(rl, '  Password: ');
+          await el.fill(password);
+          pwFilled = true;
+          break;
+        }
+      }
+      // If no password appeared either, OTP handler takes over
+    }
+
+    // Only do a final submit if we filled a password (email-only flow already submitted above)
+    if (pwFilled) {
+      console.log('  Submitting...');
+      await submitForm(page);
+      await page.waitForTimeout(3000);
+    }
   }
 
   // ── OTP ─────────────────────────────────────────────────────────────────
