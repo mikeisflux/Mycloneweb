@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mycloneweb</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #e8e8e8;
+      width: 320px;
+      min-height: 200px;
+    }
+
+    .header {
+      background: #1a1a1a;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .header-text h1 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f0f0f0;
+    }
+
+    .header-text p {
+      font-size: 10px;
+      color: #666;
+      margin-top: 1px;
+    }
+
+    .status-bar {
+      padding: 8px 16px;
+      background: #151515;
+      border-bottom: 1px solid #222;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot.green { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
+    .dot.red   { background: #ef4444; }
+    .dot.pulse { animation: pulse 2s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    #status-text { color: #888; }
+
+    .current-page {
+      padding: 10px 16px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    .current-page label {
+      font-size: 10px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    #page-url {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .actions {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #5558e8, #7c4de8);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #1e1e1e;
+      color: #ccc;
+      border: 1px solid #2a2a2a;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: #252525;
+      border-color: #444;
+    }
+
+    .btn-danger {
+      background: #1e1e1e;
+      color: #f87171;
+      border: 1px solid #2a2a2a;
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: #2a1515;
+      border-color: #7f1d1d;
+    }
+
+    .icon { font-size: 14px; }
+
+    .btn-text { flex: 1; }
+    .btn-sub  { font-size: 10px; color: #888; font-weight: 400; }
+
+    .log-area {
+      margin: 0 16px 12px;
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 8px 10px;
+      max-height: 120px;
+      overflow-y: auto;
+      font-size: 10px;
+      font-family: 'Consolas', 'Fira Code', monospace;
+      color: #666;
+      display: none;
+    }
+
+    .log-area.visible { display: block; }
+
+    .log-line { margin: 2px 0; line-height: 1.5; }
+    .log-line.ok  { color: #22c55e; }
+    .log-line.err { color: #f87171; }
+    .log-line.inf { color: #60a5fa; }
+
+    .progress-bar {
+      height: 2px;
+      background: #1e1e1e;
+      margin: 0 16px 12px;
+      border-radius: 1px;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar.visible { display: block; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .footer {
+      padding: 8px 16px;
+      border-top: 1px solid #1a1a1a;
+      font-size: 10px;
+      color: #444;
+      text-align: center;
+    }
+
+    .footer code {
+      background: #1a1a1a;
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">C</div>
+    <div class="header-text">
+      <h1>Mycloneweb</h1>
+      <p>Capture pages for Claude Code</p>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="dot red" id="status-dot"></div>
+    <span id="status-text">Connecting to local server...</span>
+  </div>
+
+  <div class="current-page">
+    <label>Current page</label>
+    <div id="page-url">—</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" id="btn-capture" disabled>
+      <span class="icon">📸</span>
+      <span class="btn-text">
+        Capture This Page
+        <div class="btn-sub">Screenshot + HTML + CSS + links → Claude Code</div>
+      </span>
+    </button>
+
+    <button class="btn-secondary" id="btn-crawl" disabled>
+      <span class="icon">🕷️</span>
+      <span class="btn-text">
+        Crawl Entire Site
+        <div class="btn-sub">Captures every page on this domain</div>
+      </span>
+    </button>
+
+    <button class="btn-secondary" id="btn-stop" style="display:none">
+      <span class="icon">⏹️</span>
+      <span class="btn-text">Stop Crawl</span>
+    </button>
+
+    <button class="btn-danger" id="btn-clear">
+      <span class="icon">🗑️</span>
+      <span class="btn-text">Clear All Captured Files</span>
+    </button>
+  </div>
+
+  <div class="progress-bar" id="progress-bar">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+
+  <div class="log-area" id="log-area"></div>
+
+  <div class="footer">
+    Run <code>npm run extension-server</code> in your project folder
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
