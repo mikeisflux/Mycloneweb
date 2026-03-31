@@ -125,8 +125,8 @@ async function crawlAllPages(page, startUrl, maxPages = 200) {
 
     try {
       process.stdout.write(`  [${found.length + 1}] ${url}\n`);
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
-      await page.waitForTimeout(800);
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForTimeout(3000);
       found.push(url);
 
       // Collect all <a href> links on this page
@@ -264,8 +264,8 @@ async function submitForm(page) {
 // ─── page scraper ────────────────────────────────────────────────────────────
 
 async function scrapePage(page, targetUrl, label) {
-  await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 30000 });
-  await page.waitForTimeout(800);
+  await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 45000 });
+  await page.waitForTimeout(3000);
 
   const slug = label || slugify(targetUrl);
 
